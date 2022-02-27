@@ -1,3 +1,4 @@
 *.ipynb
 *.idea
 *.json
+__pycache__
