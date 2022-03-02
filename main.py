@@ -3,6 +3,7 @@ from __future__ import print_function
 # DIY Package
 from job.directory_create import directory_create
 from job.get_upload_info import get_upload_info
+from job.upload_thumbnail import upload_thumbnail
 from job.yotube_upload import youtube_upload
 from model import config
 from conf import conf
@@ -23,7 +24,8 @@ youtube_client = util.get_client(youtube_conf)
 with Flow("YoutubeUpload") as flow:
     status = directory_create(client=drive_client, conf=query_conf)
     params = get_upload_info(client=spread_client, conf=spread_conf, status=status)
-    _ = youtube_upload(client=youtube_client, conf=youtube_conf, params=params)
+    params = youtube_upload(client=youtube_client, conf=youtube_conf, params=params)
+    upload_thumbnail(client=youtube_client, params=params)
 
 flow.run_config = LocalRun(
     env={"SOME_VAR": "VALUE"},

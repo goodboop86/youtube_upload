@@ -11,7 +11,7 @@ def get_upload_info(client, conf, status):
         return df[df.date == _date].to_dict("records")
 
     def create_youtube_request_param(_params, _conf):
-        _file = "{}{}/{}.mp4".format(pconf.context.ABSOLUTE_DRIVE_PATH, _params["date"], _params["file"])
+        _file = "{}{}/{}".format(pconf.context.ABSOLUTE_DRIVE_PATH, _params["date"], _params["file"])
         privacy_status = {"privacyStatus": _params["privacyStatus"]}
         del _params['file'], _params['date'], _params['privacyStatus']
 

@@ -11,7 +11,7 @@ from util.util import slack_notify, dict_to_json
 
 
 @task(name="youtube_upload", state_handlers=[slack_notifier])
-def youtube_upload(client, conf, params) -> int:
+def youtube_upload(client, conf, params) -> str:
     def resumable_upload(insert_request, _conf):
         response = None
         error = None
@@ -23,6 +23,8 @@ def youtube_upload(client, conf, params) -> int:
                 if response is not None:
                     if 'id' in response:
                         print("Video id '%s' was successfully uploaded." % response['id'])
+                        slack_notify(txt=f"```{response['id']}```")
+                        return response['id']
                     else:
                         exit("The upload failed with an unexpected response: %s" % response)
             except HttpError as e:
@@ -46,7 +48,7 @@ def youtube_upload(client, conf, params) -> int:
     file, body = params
     upload_request = client.videos().insert(
         part=",".join(body.keys()),
-        body=body, media_body=MediaFileUpload(file, chunksize=-1, resumable=True)
+        body=body, media_body=MediaFileUpload(f"{file}.mp4", chunksize=-1, resumable=True)
     )
 
     wait = 10
@@ -59,6 +61,8 @@ def youtube_upload(client, conf, params) -> int:
 
     slack_notify(txt=txt)
     tm.sleep(wait)
-    resumable_upload(upload_request, conf)
 
-    return 0
+    video_id = resumable_upload(upload_request, conf)
+    # video_id = "dI1gE9Y4YP0"
+
+    return [video_id, file]
