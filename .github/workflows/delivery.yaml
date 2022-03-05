@@ -7,6 +7,10 @@ on:
     branches:
       - develop
 
+permissions:
+  contents: read
+  pull-requests: write
+
 env:
   PROJECT_ID: ${{ secrets.GCP_PROJECT }}
   GCP_SA_KEY: ${{ secrets.GCP_SA_KEY }}
