@@ -1,4 +1,6 @@
 *.ipynb
 *.idea
 *.json
+*.mp4
+*.png
 __pycache__

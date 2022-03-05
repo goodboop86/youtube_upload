@@ -28,7 +28,7 @@ def youtube_upload(client, config, params) -> list:
                     else:
                         exit("The upload failed with an unexpected response: %s" % response)
             except HttpError as e:
-                if e.resp.status in _conf.get("RETRIABLE_STATUS_CODES"):
+                if e.resp.status in _conf["RETRIABLE_STATUS_CODES"]:
                     error = "A retriable HTTP error %d occurred:\n%s" % \
                             (e.resp.status, e.content)
                 else:
@@ -45,24 +45,23 @@ def youtube_upload(client, config, params) -> list:
                 print("Sleeping %f seconds and then retrying..." % sleep_seconds)
                 time.sleep(sleep_seconds)
 
-    file, body = params
     upload_request = client.youtube.videos().insert(
-        part=",".join(body.keys()),
-        body=body, media_body=MediaFileUpload(f"{file}.mp4", chunksize=-1, resumable=True)
+        part=",".join(params.request.keys()),
+        body=params.request, media_body=MediaFileUpload(params.mov_mp4, chunksize=-1, resumable=True)
     )
 
     wait = 10
     txt = f"<!channel>\n" \
           f"{wait}秒後に投稿処理を行います、内容を確認して下さい。\n" \
           f"*file* \n" \
-          f"```{file}```\n" \
+          f"```{params.mov_mp4}```\n" \
           f"*json* \n" \
-          f"```{dict_to_json(body)}```"
+          f"```{dict_to_json(params.request)}```"
 
     slack_notify(txt=txt)
     tm.sleep(wait)
 
     video_id = resumable_upload(upload_request, config.youtube)
-    # video_id = "dI1gE9Y4YP0"
+    params.mov_id = video_id
 
-    return [video_id, file]
+    return params
