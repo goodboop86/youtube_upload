@@ -33,7 +33,7 @@ jobs:
         with:
           # ref:https://dev.classmethod.jp/articles/google-cloud-auth-with-workload-identity/
           workload_identity_provider: "projects/934369182340/locations/global/workloadIdentityPools/my-pool/providers/my-provider"
-          service_account: "934369182340-compute@developer.gserviceaccount.com"
+          service_account: "youtubeservice@youtubeoperation.iam.gserviceaccount.com"
 
       - name: Setup Cloud SDK
         uses: google-github-actions/setup-gcloud@v0.2.0
