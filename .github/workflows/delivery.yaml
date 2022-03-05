@@ -26,7 +26,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
 
-      - id: auth
+      - id: 'auth'
         uses: 'google-github-actions/auth@v0.4.1'
         with:
           # ref:https://dev.classmethod.jp/articles/google-cloud-auth-with-workload-identity/
