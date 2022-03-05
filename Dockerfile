@@ -14,15 +14,19 @@ RUN apt-get install -y vim less
 RUN pip install --upgrade pip
 RUN pip install --upgrade setuptools
 
-COPY requirements.txt .
+COPY . .
 RUN pip install -r requirements.txt
 
 # see https://developer.feedforce.jp/entry/2021/03/15/102530
 # export PREFECT_API_KEY="[KEY] && DOCKER_BUILDKIT=1 docker build --secret id=my_env1,env=PREFECT_API_KEY --no-cache --progress=plain .
 RUN --mount=type=secret,id=my_env1 prefect auth login --key `cat /run/secrets/my_env1`
 
-ENTRYPOINT [ "prefect", "agent", "local" ]
-CMD ["start"]
+# https://ahmet.im/blog/cloud-run-multiple-processes-easy-way/
+ENV TINI_VERSION v0.18.0
+ADD https://github.com/krallin/tini/releases/download/${TINI_VERSION}/tini-static /tini
+RUN chmod +x /tini
 
 EXPOSE 8080
-RUN uvicorn main:app --host 0.0.0.0 --port 8080
+RUN sed -i -e "s/PORT/$PORT/g" start.sh
+
+ENTRYPOINT ["/tini", "--", "./start.sh"]
