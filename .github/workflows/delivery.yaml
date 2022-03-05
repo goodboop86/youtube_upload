@@ -17,7 +17,7 @@ env:
   PREFECT_API_KEY: ${{ secrets.PREFECT_API_KEY }}
   SERVICE: youtubeservice
   REGION: asia-northeast1
-  IMAGE: gcr.io/${{ secrets.GCP_PROJECT }}/${{ secrets.SERVICE }}:${{ github.sha }}
+  IMAGE: asia.gcr.io/${{ secrets.GCP_PROJECT }}/${{ secrets.SERVICE }}:${{ github.sha }}
 
 jobs:
   deploy:
