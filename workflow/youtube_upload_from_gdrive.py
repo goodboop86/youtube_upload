@@ -25,12 +25,13 @@ client = ApiClient(drive=get_client(config.drive),
                    youtube=get_client(config.youtube))
 
 
-def youtube_upload_workflow():
+def youtube_upload_from_gdrive():
     with Flow("YoutubeUpload") as flow:
-        status = directory_create(client=client, config=config)
-        params = get_upload_file(client=client, config=config, status=status)
-        params = youtube_upload(client=client, config=config, params=params)
-        upload_thumbnail(client=client, params=params)
+        relay = directory_create(client=client, config=config)
+        relay = get_upload_file(client=client, config=config, _=relay)
+        yt_params = get_upload_info(client=client, config=config, _=relay)
+        yt_params = youtube_upload(client=client, config=config, params=yt_params)
+        upload_thumbnail(client=client, params=yt_params)
 
     flow.run_config = LocalRun(
         env={"SOME_VAR": "VALUE"},
@@ -41,5 +42,5 @@ def youtube_upload_workflow():
     return state
 
 if __name__ == "__main__":
-    state=youtube_upload_workflow()
+    state=youtube_upload_from_gdrive()
     print("done")

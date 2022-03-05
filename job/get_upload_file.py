@@ -1,37 +1,53 @@
+import io
+import os
 from datetime import datetime
-import pandas as pd
+from googleapiclient.http import MediaIoBaseDownload
 from prefect import task
 from prefect.utilities.notifications import slack_notifier
-from prefect import config as pconf
+from prefect import config as pconfig
 
 
-@task(name="get_upload_info", state_handlers=[slack_notifier])
-def get_upload_file(client, config, status):
-    def get_params_from_sheet_by_date(df, _date) -> dict:
-        return df[df.date == _date].to_dict("records")
+@task(name="get_upload_file", state_handlers=[slack_notifier])
+def get_upload_file(client, config, _):
+    # 指定IDのファイルを取得
+    def get_file(_fileid, _filename, _date, _client):
+        request = _client.files().get_media(fileId=_fileid)
 
-    def create_youtube_request_param(_params, _conf):
-        _file = "{}{}/{}".format(pconf.context.ABSOLUTE_DRIVE_PATH, _params["date"], _params["file"])
-        privacy_status = {"privacyStatus": _params["privacyStatus"]}
-        del _params['file'], _params['date'], _params['privacyStatus']
+        if not os.path.exists(_date): os.mkdir(_date)
 
-        return _file, {"snippet": _params, "status": privacy_status}
+        fh = io.FileIO(f"{_date}/{_filename}", 'wb')
+        downloader = MediaIoBaseDownload(fh, request)
+        done = False
+        while done is False:
+            status, done = downloader.next_chunk()
+            print(f"Download {int(status.progress() * 100)}%")
 
-    # spreadシートからtsv中身を取得
-    header = client.spread.spreadsheets().values().get(spreadsheetId=pconf.context.spread.UPLOAD_LIST_ID,
-                                                       range=config.spread.get("HEADER_RANGE")).execute().get('values', [])
+    # YOUTUBE_DIR_IDフォルダに含まれるファイルリストを取得
+    query = config.query["GET_FNAME_FROMDIR_ID"].replace("[DIR_ID]", pconfig.context.drive.YOUTUBE_DIR_ID)
+    result = client.drive.files().list(q=query, pageSize=100,
+                                       fields=config.query["FIELD1"]).execute().get('files', [])
 
-    body = client.spread.spreadsheets().values().get(spreadsheetId=pconf.context.spread.UPLOAD_LIST_ID,
-                                                     range=config.spread.get("BODY_RANGE")).execute().get('values', [])
+    # 実行日のディレクトリIDを取得
+    today_dir_id = [d['id'] for d in result if
+                    d['name'] == datetime.now().strftime("%Y-%m-%d") and
+                    d["trashed"] is False and
+                    d['mimeType'] == 'application/vnd.google-apps.folder']
 
-    query = config.query.get("GET_FNAME_FROMDIR_ID").replace("[DIR_ID]", pconf.context.drive.YOUTUBE_DIR_ID)
-    result = client.drive.files().list(q=query, pageSize=20,
-                                 fields=config.query.get("FIELD1")).execute().get('files', [])
+    # 実行日のディレクトリは１つ想定
+    assert len(today_dir_id) == 1, f"expect:[1], actual[{len(today_dir_id)}]"
+    today_dir_id = today_dir_id[0]
 
-    params = get_params_from_sheet_by_date(
-        df=pd.DataFrame(body, columns=header[0]),
-        _date=datetime.now().strftime("%Y-%m-%d"))[0]
+    # 実行日のディレクトリ内のファイルIDを取得
+    query = config.query["GET_FNAME_FROMDIR_ID"].replace("[DIR_ID]", today_dir_id)
+    result = client.drive.files().list(q=query, pageSize=100,
+                                       fields=config.query["FIELD1"]).execute().get('files', [])
 
-    file, body = create_youtube_request_param(params, config.youtube)
+    # 実行日のディレクトリ内のファイルID, ファイル名を取得
+    filedata = [(d['id'], d['name']) for d in result]
 
-    return [file, body]
+    assert len(filedata) == 2, f"expect:[2], actual[{len(filedata)}]"
+
+    for fileid, filename in filedata:
+        get_file(_fileid=fileid, _filename=filename, _date=datetime.now().strftime("%Y-%m-%d"), _client=client.drive)
+
+    return _

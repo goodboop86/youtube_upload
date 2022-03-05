@@ -8,7 +8,7 @@ from prefect.utilities.notifications import slack_notifier
 
 
 @task(name="directory_create", state_handlers=[slack_notifier])
-def directory_create(client, config) -> int:
+def directory_create(client, config, _=None):
     # ディレクトリ情報を取得
     query = config.query["GET_FNAME_FROMDIR_ID"].replace("[DIR_ID]", pconfig.context.drive.YOUTUBE_DIR_ID)
     result = client.drive.files().list(q=query, pageSize=20,
@@ -34,4 +34,4 @@ def directory_create(client, config) -> int:
             client.files().create(body=file_metadata, fields='id').execute()
             print(date_str, " created.")
 
-    return 0
+    return _
