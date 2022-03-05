@@ -30,7 +30,7 @@ jobs:
         uses: 'google-github-actions/auth@v0.4.1'
         with:
           # ref:https://dev.classmethod.jp/articles/google-cloud-auth-with-workload-identity/
-          workload_identity_provider: "projects/934369182340/locations/global/workloadIdentityPools/my-pool"
+          workload_identity_provider: "projects/934369182340/locations/global/workloadIdentityPools/my-pool/providers/my-provider"
           service_account: "934369182340-compute@developer.gserviceaccount.com"
 
       - name: Setup Cloud SDK
