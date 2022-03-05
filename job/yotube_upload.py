@@ -11,7 +11,7 @@ from util.util import slack_notify, dict_to_json
 
 
 @task(name="youtube_upload", state_handlers=[slack_notifier])
-def youtube_upload(client, conf, params) -> str:
+def youtube_upload(client, config, params) -> list:
     def resumable_upload(insert_request, _conf):
         response = None
         error = None
@@ -33,12 +33,12 @@ def youtube_upload(client, conf, params) -> str:
                             (e.resp.status, e.content)
                 else:
                     raise
-            except _conf.get("RETRIABLE_EXCEPTIONS") as e:
+            except _conf["RETRIABLE_EXCEPTIONS"] as e:
                 error = "A retriable error occurred: %s" % e
             if error is not None:
                 print(error)
                 retry += 1
-                if retry > _conf.get("MAX_RETRIES"):
+                if retry > _conf["MAX_RETRIES"]:
                     exit("No longer attempting to retry.")
                 max_sleep = 2 ** retry
                 sleep_seconds = random.random() * max_sleep
@@ -46,7 +46,7 @@ def youtube_upload(client, conf, params) -> str:
                 time.sleep(sleep_seconds)
 
     file, body = params
-    upload_request = client.videos().insert(
+    upload_request = client.youtube.videos().insert(
         part=",".join(body.keys()),
         body=body, media_body=MediaFileUpload(f"{file}.mp4", chunksize=-1, resumable=True)
     )
@@ -62,7 +62,7 @@ def youtube_upload(client, conf, params) -> str:
     slack_notify(txt=txt)
     tm.sleep(wait)
 
-    video_id = resumable_upload(upload_request, conf)
+    video_id = resumable_upload(upload_request, config.youtube)
     # video_id = "dI1gE9Y4YP0"
 
     return [video_id, file]

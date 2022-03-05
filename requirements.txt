@@ -10,3 +10,6 @@ apiclient~=1.0.4
 httplib2~=0.20.4
 slackweb~=1.0.5
 prefect~=1.0.0
+uvicorn[standard]
+# pip install fastapi[all]
+fastapi~=0.74.1

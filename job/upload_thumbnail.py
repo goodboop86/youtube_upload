@@ -7,7 +7,7 @@ from prefect.utilities.notifications import slack_notifier
 def upload_thumbnail(client, params):
     video_id, file = params
     try:
-        res = client.thumbnails().set(
+        res = client.youtube.thumbnails().set(
             videoId=video_id,
             media_body=f"{file}.png"
         ).execute()

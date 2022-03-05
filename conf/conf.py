@@ -1,5 +1,4 @@
 import http.client
-
 import httplib2
 
 spread_conf = {

@@ -1,9 +1,8 @@
-class Config(object):
-    def __init__(self, drive, spread, youtube, query):
+class ApiClient(object):
+    def __init__(self, drive, spread, youtube):
         self._drive = drive
         self._spread = spread
         self._youtube = youtube
-        self._query = query
 
     @property
     def drive(self):
@@ -16,7 +15,3 @@ class Config(object):
     @property
     def youtube(self):
         return self._youtube
-
-    @property
-    def query(self):
-        return self._query
