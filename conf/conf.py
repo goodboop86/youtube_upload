@@ -2,8 +2,8 @@ import http.client
 import httplib2
 
 spread_conf = {
-    "TOKEN": '/token/SpreadSheetAccessToken.json',
-    "CREDENTIALS": '/credential/SpreadSheetAccessCredentials.json',
+    "TOKEN": '/token/spreadsheet-access-token.json',
+    "CREDENTIALS": '/credential/spreadsheet-access-credentials.json',
     "VERSION": 'v4',
     "SERVICE_NAME": 'sheets',
     "SCOPES": ['https://www.googleapis.com/auth/spreadsheets.readonly'],
@@ -12,16 +12,16 @@ spread_conf = {
 }
 
 drive_conf = {
-    "TOKEN": '/token/GoogleDriveAccessToken.json',
-    "CREDENTIALS": '/credential/GoogleDriveAccessCredentials.json',
+    "TOKEN": '/token/googledrive-access-token.json',
+    "CREDENTIALS": '/credential/googledrive-access-credentials.json',
     "VERSION": 'v3',
     "SERVICE_NAME": 'drive',
     "SCOPES": ['https://www.googleapis.com/auth/drive', 'https://www.googleapis.com/auth/spreadsheets'],
 }
 
 youtube_conf = {
-    "TOKEN": '/token/YouTubeAccessToken.json',
-    "CREDENTIALS": '/credential/YouTubeAccessCredentials.json',
+    "TOKEN": '/token/youtube-access-token.json',
+    "CREDENTIALS": '/credential/youtube-access-credentials.json',
     "VERSION": 'v3',
     "SERVICE_NAME": 'youtube',
     "SCOPES": ['https://www.googleapis.com/auth/youtube.upload'],
