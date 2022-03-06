@@ -22,12 +22,15 @@ def get_client(conf):
     if credentials_env is not None:
         with open(credentials_path, mode='x') as f:
             f.write(credentials_env)
+        os.chmod(credentials_path, 0o755)
 
     token_path = conf["TOKEN"]
     token_env = os.getenv(conf["TOKEN_ENV"])
     if token_env is not None:
         with open(token_path, mode='x') as f:
             f.write(token_env)
+        os.chmod(credentials_path, 0o755)
+
 
     try:
         creds = None
