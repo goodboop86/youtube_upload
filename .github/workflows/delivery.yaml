@@ -13,8 +13,8 @@ permissions:
 
 env:
   PROJECT_ID: ${{ secrets.GCP_PROJECT }}
-  GCP_SA_KEY: ${{ secrets.GCP_SA_KEY }}
   PREFECT_API_KEY: ${{ secrets.PREFECT_API_KEY }}
+  SERVICE_ACCOUNT: youtubeservice@youtubeoperation.iam.gserviceaccount.com
   SERVICE: youtubeservice
   REGION: asia-northeast1
   IMAGE: gcr.io/${{ secrets.GCP_PROJECT }}/${{ secrets.SERVICE }}:${{ github.sha }}
@@ -33,7 +33,7 @@ jobs:
         with:
           # ref:https://dev.classmethod.jp/articles/google-cloud-auth-with-workload-identity/
           workload_identity_provider: "projects/934369182340/locations/global/workloadIdentityPools/my-pool/providers/my-provider"
-          service_account: "youtubeservice@youtubeoperation.iam.gserviceaccount.com"
+          service_account: ${{ env.SERVICE_ACCOUNT }}
 
       - name: Setup Cloud SDK
         uses: google-github-actions/setup-gcloud@v0.2.0
@@ -51,7 +51,7 @@ jobs:
         run: |
           gcloud run deploy $PROJECT_ID --image gcr.io/${{ env.PROJECT_ID }}/${{ env.SERVICE }}:${{ github.sha }} --platform managed --region ${{ env.REGION }} \
           --allow-unauthenticated \
-          --service-account "youtubeservice@youtubeoperation.iam.gserviceaccount.com"
+          --service-account ${{ env.SERVICE_ACCOUNT }}
           --update-secrets=GOOGLEDRIVE_ACCESS_CREDENTIALS=googledrive-access-credentials:latest \
           --update-secrets=SPREADSHEET_ACCESS_CREDENTIALS=spreadsheet-access-credentials:latest \
           --update-secrets=YOUTUBE_ACCESS_CREDENTIALS=youtube-access-credentials:latest \
