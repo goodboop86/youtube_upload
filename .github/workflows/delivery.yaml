@@ -50,12 +50,22 @@ jobs:
       - name: Deploy
         run: |
           gcloud run deploy $PROJECT_ID --image gcr.io/${{ env.PROJECT_ID }}/${{ env.SERVICE }}:${{ github.sha }} --platform managed --region ${{ env.REGION }} \
-          --update-secrets=/credential/googledrive-access-credentials.json=googledrive-access-credentials:latest \
-          --update-secrets=/credential/spreadsheet-access-credentials.json=spreadsheet-access-credentials:latest \
-          --update-secrets=/credential/youtube-access-credentials.json=youtube-access-credentials:latest \
-          --update-secrets=/token/googledrive-access-token.json=googledrive-access-token:latest \
-          --update-secrets=/token/spreadsheet-access-token.json=spreadsheet-access-token:latest \
-          --update-secrets=/token/youtube-access-token.json=youtube-access-token:latest
+          --update-secrets=GOOGLEDRIVE-ACCESS-CREDENTIALS=googledrive-access-credentials:latest \
+          --update-secrets=SPREADSHEET-ACCESS-CREDENTIALS=spreadsheet-access-credentials:latest \
+          --update-secrets=YOUTUBE-ACCESS-CREDENTIALS=youtube-access-credentials:latest \
+          --update-secrets=GOOGLEDRIVE-ACCESS-TOKEN=googledrive-access-token:latest \
+          --update-secrets=SPREADSHEET-ACCESS-TOKEN=spreadsheet-access-token:latest \
+          --update-secrets=YOUTUBE-ACCESS-TOKEN=youtube-access-token:latest
+
+      # - name: Deploy
+      #   run: |
+      #     gcloud run deploy $PROJECT_ID --image gcr.io/${{ env.PROJECT_ID }}/${{ env.SERVICE }}:${{ github.sha }} --platform managed --region ${{ env.REGION }} \
+      #     --update-secrets=/credential/googledrive-access-credentials.json=googledrive-access-credentials:latest \
+      #     --update-secrets=/credential/spreadsheet-access-credentials.json=spreadsheet-access-credentials:latest \
+      #     --update-secrets=/credential/youtube-access-credentials.json=youtube-access-credentials:latest \
+      #     --update-secrets=/token/googledrive-access-token.json=googledrive-access-token:latest \
+      #     --update-secrets=/token/spreadsheet-access-token.json=spreadsheet-access-token:latest \
+      #     --update-secrets=/token/youtube-access-token.json=youtube-access-token:latest
 
 
       # - name: Build

@@ -2,9 +2,9 @@ import http.client
 import httplib2
 
 drive_conf = {
-    "CREDENTIALS": '/credential/googledrive-access-credentials.json',
+    "CREDENTIALS": 'credential/googledrive-access-credentials.json',
     "CREDENTIALS_ENV": 'GOOGLEDRIVE_ACCESS_CREDENTIALS',
-    "TOKEN": '/token/googledrive-access-token.json',
+    "TOKEN": 'token/googledrive-access-token.json',
     "TOKEN_ENV": 'SPREADSHEET_ACCESS_TOKEN',
     "VERSION": 'v3',
     "SERVICE_NAME": 'drive',
@@ -12,9 +12,9 @@ drive_conf = {
 }
 
 spread_conf = {
-    "CREDENTIALS": '/credential/spreadsheet-access-credentials.json',
+    "CREDENTIALS": 'credential/spreadsheet-access-credentials.json',
     "CREDENTIALS_ENV": 'SPREADSHEET_ACCESS_CREDENTIALS',
-    "TOKEN": '/token/spreadsheet-access-token.json',
+    "TOKEN": 'token/spreadsheet-access-token.json',
     "TOKEN_ENV": 'GOOGLEDRIVE_ACCESS_TOKEN',
     "VERSION": 'v4',
     "SERVICE_NAME": 'sheets',
@@ -24,9 +24,9 @@ spread_conf = {
 }
 
 youtube_conf = {
-    "CREDENTIALS": '/credential/youtube-access-credentials.json',
+    "CREDENTIALS": 'credential/youtube-access-credentials.json',
     "CREDENTIALS_ENV": 'YOUTUBE_ACCESS_CREDENTIALS',
-    "TOKEN": '/token/youtube-access-token.json',
+    "TOKEN": 'token/youtube-access-token.json',
     "TOKEN_ENV": 'YOUTUBE_ACCESS_TOKEN',
     "VERSION": 'v3',
     "SERVICE_NAME": 'youtube',
