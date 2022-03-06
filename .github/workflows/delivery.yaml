@@ -43,7 +43,8 @@ jobs:
 
       - name: Build and Push Container
         run: |-
-          DOCKER_BUILDKIT=1 docker build -t gcr.io/${{ env.PROJECT_ID }}/${{ env.SERVICE }}:${{ github.sha }} --secret id=my_env1,env=${{ secrets.PREFECT_API_KEY }} --no-cache --progress=plain .
+          export PREFECT_API_KEY=${{ secrets.PREFECT_API_KEY }}
+          DOCKER_BUILDKIT=1 docker build -t gcr.io/${{ env.PROJECT_ID }}/${{ env.SERVICE }}:${{ github.sha }} --secret id=my_env1,env=PREFECT_API_KEY --no-cache --progress=plain .
           docker push gcr.io/${{ env.PROJECT_ID }}/${{ env.SERVICE }}:${{ github.sha }}
 
       # - name: Build
