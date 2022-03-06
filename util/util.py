@@ -34,21 +34,21 @@ def get_client(conf):
         # The file GoogleDriveAccessToken.json stores the user's access and refresh tokens, and is
         # created automatically when the authorization flow completes for the first
         # time.
-        if os.path.exists(conf.get("TOKEN")):
-            creds = Credentials.from_authorized_user_file(conf.get("TOKEN"), conf.get("SCOPES"))
+        if os.path.exists(conf["TOKEN"]):
+            creds = Credentials.from_authorized_user_file(conf["TOKEN"], conf["SCOPES"])
         # If there are no (valid) credentials available, let the user log in.
         if not creds or not creds.valid:
             if creds and creds.expired and creds.refresh_token:
                 creds.refresh(Request())
             else:
                 flow = InstalledAppFlow.from_client_secrets_file(
-                    conf.get("CREDENTIALS"), conf.get("SCOPES"))
+                    conf["CREDENTIALS"], conf["SCOPES"])
                 creds = flow.run_local_server(port=0)
             # Save the credentials for the next run
-            with open(conf.get("TOKEN"), 'w') as token:
+            with open(conf["TOKEN"], 'w') as token:
                 token.write(creds.to_json())
 
-        return build(conf.get("SERVICE_NAME"), conf.get("VERSION"), credentials=creds)
+        return build(conf["SERVICE_NAME"], conf["VERSION"], credentials=creds)
     except HttpError as err:
         print(err)
 
