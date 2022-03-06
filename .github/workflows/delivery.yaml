@@ -51,10 +51,10 @@ jobs:
         run: |
           gcloud run deploy $PROJECT_ID --image gcr.io/${{ env.PROJECT_ID }}/${{ env.SERVICE }}:${{ github.sha }} --platform managed --region ${{ env.REGION }} \
           --update-secrets=/credential/googledrive-access-credentials.json=googledrive-access-credentials:latest \
-          --update-secrets=/token/googledrive-access-token.json=googledrive-access-token:latest \
           --update-secrets=/credential/spreadsheet-access-credentials.json=spreadsheet-access-credentials:latest \
-          --update-secrets=/token/spreadsheet-access-token.json=spreadsheet-access-token:latest \
           --update-secrets=/credential/youtube-access-credentials.json=youtube-access-credentials:latest \
+          --update-secrets=/token/googledrive-access-token.json=googledrive-access-token:latest \
+          --update-secrets=/token/spreadsheet-access-token.json=spreadsheet-access-token:latest \
           --update-secrets=/token/youtube-access-token.json=youtube-access-token:latest
 
 
