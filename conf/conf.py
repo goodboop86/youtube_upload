@@ -1,9 +1,21 @@
 import http.client
 import httplib2
 
+drive_conf = {
+    "CREDENTIALS": 'credential/googledrive-access-credentials.json',
+    "CREDENTIALS_ENV": 'GOOGLEDRIVE_ACCESS_CREDENTIALS',
+    "TOKEN": 'token/googledrive-access-token.json',
+    "TOKEN_ENV": 'SPREADSHEET_ACCESS_TOKEN',
+    "VERSION": 'v3',
+    "SERVICE_NAME": 'drive',
+    "SCOPES": ['https://www.googleapis.com/auth/drive', 'https://www.googleapis.com/auth/spreadsheets'],
+}
+
 spread_conf = {
-    "TOKEN": '/token/spreadsheet-access-token.json',
-    "CREDENTIALS": '/credential/spreadsheet-access-credentials.json',
+    "CREDENTIALS": 'credential/spreadsheet-access-credentials.json',
+    "CREDENTIALS_ENV": 'SPREADSHEET_ACCESS_CREDENTIALS',
+    "TOKEN": 'token/spreadsheet-access-token.json',
+    "TOKEN_ENV": 'GOOGLEDRIVE_ACCESS_TOKEN',
     "VERSION": 'v4',
     "SERVICE_NAME": 'sheets',
     "SCOPES": ['https://www.googleapis.com/auth/spreadsheets.readonly'],
@@ -11,17 +23,11 @@ spread_conf = {
     "HEADER_RANGE": 'Sheet1!A1:G1'
 }
 
-drive_conf = {
-    "TOKEN": '/token/googledrive-access-token.json',
-    "CREDENTIALS": '/credential/googledrive-access-credentials.json',
-    "VERSION": 'v3',
-    "SERVICE_NAME": 'drive',
-    "SCOPES": ['https://www.googleapis.com/auth/drive', 'https://www.googleapis.com/auth/spreadsheets'],
-}
-
 youtube_conf = {
-    "TOKEN": '/token/youtube-access-token.json',
-    "CREDENTIALS": '/credential/youtube-access-credentials.json',
+    "CREDENTIALS": 'credential/youtube-access-credentials.json',
+    "CREDENTIALS_ENV": 'YOUTUBE_ACCESS_CREDENTIALS',
+    "TOKEN": 'token/youtube-access-token.json',
+    "TOKEN_ENV": 'YOUTUBE_ACCESS_TOKEN',
     "VERSION": 'v3',
     "SERVICE_NAME": 'youtube',
     "SCOPES": ['https://www.googleapis.com/auth/youtube.upload'],

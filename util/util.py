@@ -2,6 +2,7 @@ from __future__ import print_function
 
 import json
 import os.path
+import os
 from prefect import config as pconf
 
 from google.auth.transport.requests import Request
@@ -14,6 +15,20 @@ from slackweb import slackweb
 
 
 def get_client(conf):
+
+    # CloudRunでcredentialなどを環境変数で設定する場合
+    credentials_path = conf["CREDENTIALS"]
+    credentials_env = os.getenv(conf["CREDENTIALS_ENV"])
+    if credentials_env is not None:
+        with open(credentials_path, mode='x') as f:
+            f.write(credentials_env)
+
+    token_path = conf["TOKEN"]
+    token_env = os.getenv(conf["TOKEN_ENV"])
+    if token_env is not None:
+        with open(token_path, mode='x') as f:
+            f.write(token_env)
+
     try:
         creds = None
         # The file GoogleDriveAccessToken.json stores the user's access and refresh tokens, and is
