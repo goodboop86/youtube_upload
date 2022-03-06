@@ -15,7 +15,6 @@ from slackweb import slackweb
 
 
 def get_client(conf):
-
     # CloudRunでcredentialなどを環境変数で設定する場合
     credentials_path = conf["CREDENTIALS"]
     credentials_env = os.getenv(conf["CREDENTIALS_ENV"])
@@ -29,8 +28,7 @@ def get_client(conf):
     if token_env is not None:
         with open(token_path, mode='x') as f:
             f.write(token_env)
-        os.chmod(credentials_path, 0o755)
-
+        os.chmod(token_path, 0o755)
 
     try:
         creds = None
@@ -50,6 +48,28 @@ def get_client(conf):
             # Save the credentials for the next run
             with open(conf["TOKEN"], 'w') as token:
                 token.write(creds.to_json())
+
+        return build(conf["SERVICE_NAME"], conf["VERSION"], credentials=creds)
+    except HttpError as err:
+        print(err)
+
+
+def get_client_by_token(conf):
+    # CloudRunでcredentialなどを環境変数で設定する場合
+    token_path = conf["TOKEN"]
+    token_env = os.getenv(conf["TOKEN_ENV"])
+    if token_env is not None:
+        with open(token_path, mode='x') as f:
+            f.write(token_env)
+        os.chmod(token_path, 0o755)
+
+    try:
+        creds = None
+        # The file GoogleDriveAccessToken.json stores the user's access and refresh tokens, and is
+        # created automatically when the authorization flow completes for the first
+        # time.
+        if os.path.exists(conf["TOKEN"]):
+            creds = Credentials.from_authorized_user_file(conf["TOKEN"], conf["SCOPES"])
 
         return build(conf["SERVICE_NAME"], conf["VERSION"], credentials=creds)
     except HttpError as err:
