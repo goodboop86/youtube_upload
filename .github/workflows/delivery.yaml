@@ -47,6 +47,17 @@ jobs:
           DOCKER_BUILDKIT=1 docker build -t gcr.io/${{ env.PROJECT_ID }}/${{ env.SERVICE }}:${{ github.sha }} --secret id=my_env1,env=PREFECT_API_KEY --no-cache --progress=plain .
           docker push gcr.io/${{ env.PROJECT_ID }}/${{ env.SERVICE }}:${{ github.sha }}
 
+      - name: Deploy
+        run: |
+          gcloud run deploy $PROJECT_ID --image gcr.io/${{ env.PROJECT_ID }}/${{ env.SERVICE }}:${{ github.sha }} --platform managed --region $RUN_REGION \
+          --update-secrets=credential/googledrive-access-credentials.json=googledrive-access-credentials:latest \
+          --update-secrets=token/googledrive-access-token.json=googledrive-access-token:latest \
+          --update-secrets=credential/spreadsheet-access-credentials.json=spreadsheet-access-credentials:latest \
+          --update-secrets=token/spreadsheet-access-token.json=spreadsheet-access-token:latest \
+          --update-secrets=credential/youtube-access-credentials.json=youtube-access-credentials:latest \
+          --update-secrets=token/youtube-access-token.json=youtube-access-token:latest
+
+
       # - name: Build
       #   uses: docker/build-push-action@v2
       #   with:
@@ -55,16 +66,16 @@ jobs:
       #     secrets: |
       #       "my_env1=${{ secrets.PREFECT_API_KEY }}"
 
-      - id: 'deploy'
-        uses: google-github-actions/deploy-cloudrun@v0.7.0
-        with:
-          service: ${{ env.SERVICE }}
-          image: gcr.io/${{ env.PROJECT_ID }}/${{ env.SERVICE }}:${{ github.sha }}
-          region: ${{ env.REGION }}
-          secrets: |
-            GOOGLEDRIVE_ACCESS_CREDENTIALS=googledrive-access-credentials:1
-            SPREADSHEET_ACCESS_CREDENTIALS=spreadsheet-access-credentials:1
-            YOUTUBE_ACCESS_CREDENTIALS=youtube-access-credentials:1
-            GOOGLEDRIVE_ACCESS_TOKEN=googledrive-access-token:1
-            SPREADSHEET_ACCESS_TOKEN=spreadsheet-access-token:1
-            YOUTUBE_ACCESS_TOKEN=youtube-access-token:1
+      # - id: 'deploy'
+      #   uses: google-github-actions/deploy-cloudrun@v0.7.0
+      #   with:
+      #     service: ${{ env.SERVICE }}
+      #     image: gcr.io/${{ env.PROJECT_ID }}/${{ env.SERVICE }}:${{ github.sha }}
+      #     region: ${{ env.REGION }}
+      #     secrets: |
+      #       GOOGLEDRIVE_ACCESS_CREDENTIALS=googledrive-access-credentials:1
+      #       SPREADSHEET_ACCESS_CREDENTIALS=spreadsheet-access-credentials:1
+      #       YOUTUBE_ACCESS_CREDENTIALS=youtube-access-credentials:1
+      #       GOOGLEDRIVE_ACCESS_TOKEN=googledrive-access-token:1
+      #       SPREADSHEET_ACCESS_TOKEN=spreadsheet-access-token:1
+      #       YOUTUBE_ACCESS_TOKEN=youtube-access-token:1
