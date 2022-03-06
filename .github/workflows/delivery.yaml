@@ -53,5 +53,5 @@ jobs:
         uses: google-github-actions/deploy-cloudrun@v0.7.0
         with:
           service: ${{ env.SERVICE }}
-          image: ${{ env.IMAGE }}
+          image: asia.gcr.io/${{ env.PROJECT_ID }}/${{ env.SERVICE }}:${{ github.sha }}
           region: ${{ env.REGION }}
