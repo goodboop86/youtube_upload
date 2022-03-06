@@ -65,4 +65,7 @@ jobs:
             /credential/GoogleDriveAccessCredentials.json=GoogleDriveAccessCredentials:latest
             /credential/SpreadSheetAccessCredentials.json=SpreadSheetAccessCredentials:latest
             /credential/YouTubeAccessCredentials.json=YouTubeAccessCredentials:latest
+            /token/GoogleDriveAccessToken.json=GoogleDriveAccessToken:latest
+            /token/SpreadSheetAccessToken.json=SpreadSheetAccessToken:latest
+            /token/YouTubeAccessToken.json=YouTubeAccessToken:latest
 
