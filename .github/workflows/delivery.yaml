@@ -51,6 +51,7 @@ jobs:
         run: |
           gcloud run deploy $PROJECT_ID --image gcr.io/${{ env.PROJECT_ID }}/${{ env.SERVICE }}:${{ github.sha }} --platform managed --region ${{ env.REGION }} \
           --allow-unauthenticated \
+          --service-account "youtubeservice@youtubeoperation.iam.gserviceaccount.com"
           --update-secrets=GOOGLEDRIVE_ACCESS_CREDENTIALS=googledrive-access-credentials:latest \
           --update-secrets=SPREADSHEET_ACCESS_CREDENTIALS=spreadsheet-access-credentials:latest \
           --update-secrets=YOUTUBE_ACCESS_CREDENTIALS=youtube-access-credentials:latest \
