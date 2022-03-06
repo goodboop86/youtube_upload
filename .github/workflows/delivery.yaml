@@ -49,7 +49,7 @@ jobs:
 
       - name: Deploy
         run: |
-          gcloud run deploy $PROJECT_ID --image gcr.io/${{ env.PROJECT_ID }}/${{ env.SERVICE }}:${{ github.sha }} --platform managed --region $RUN_REGION \
+          gcloud run deploy $PROJECT_ID --image gcr.io/${{ env.PROJECT_ID }}/${{ env.SERVICE }}:${{ github.sha }} --platform managed --region ${{ env.REGION }} \
           --update-secrets=credential/googledrive-access-credentials.json=googledrive-access-credentials:latest \
           --update-secrets=token/googledrive-access-token.json=googledrive-access-token:latest \
           --update-secrets=credential/spreadsheet-access-credentials.json=spreadsheet-access-credentials:latest \
