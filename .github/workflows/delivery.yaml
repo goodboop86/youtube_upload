@@ -62,10 +62,9 @@ jobs:
           image: gcr.io/${{ env.PROJECT_ID }}/${{ env.SERVICE }}:${{ github.sha }}
           region: ${{ env.REGION }}
           secrets: |
-            /credential/GoogleDriveAccessCredentials.json=GoogleDriveAccessCredentials:latest
-            /credential/SpreadSheetAccessCredentials.json=SpreadSheetAccessCredentials:latest
-            /credential/YouTubeAccessCredentials.json=YouTubeAccessCredentials:latest
-            /token/GoogleDriveAccessToken.json=GoogleDriveAccessToken:latest
-            /token/SpreadSheetAccessToken.json=SpreadSheetAccessToken:latest
-            /token/YouTubeAccessToken.json=YouTubeAccessToken:latest
-
+            /credential/GoogleDriveAccessCredentials.json=GoogleDriveAccessCredentials:1
+            /credential/SpreadSheetAccessCredentials.json=SpreadSheetAccessCredentials:1
+            /credential/YouTubeAccessCredentials.json=YouTubeAccessCredentials:1
+            /token/GoogleDriveAccessToken.json=GoogleDriveAccessToken:1
+            /token/SpreadSheetAccessToken.json=SpreadSheetAccessToken:1
+            /token/YouTubeAccessToken.json=YouTubeAccessToken:1
