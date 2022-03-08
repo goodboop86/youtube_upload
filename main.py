@@ -1,24 +1,28 @@
 from fastapi import FastAPI
-import workflow.youtube_upload_from_gdrive as wf
-
-from model.config import Config
-from model.api_client import ApiClient
-from conf import conf
-from util.util import get_client, get_client_by_token
+import workflow.workflow as wf
 
 app = FastAPI()
 
-config = Config(drive=conf.drive_conf,
-                spread=conf.spread_conf,
-                youtube=conf.youtube_conf,
-                query=conf.query_conf)
-
-client = ApiClient(drive=get_client_by_token(config.drive),
-                   spread=get_client_by_token(config.spread),
-                   youtube=get_client_by_token(config.youtube))
+if not set(locals()) >= {'client', 'config'}:
+    client, config = wf.initialize()
 
 
 @app.get("/youtube_upload_from_gdrive")
-async def root():
+async def youtube_upload_from_gdrive():
+    """
+    This function uploads your movie to youtube from your google-drive.
+    - Movie is must on your google-drive and stored by today(yyyy-mm-dd) folder name.
+    - Additionally, It is necessary to wrote contents on your spread-sheet already.
+    """
     state = wf.youtube_upload_from_gdrive(client=client, config=config)
-    return {"message": f"{state.result}"}
+    return {str(k[0]): str(k[1]) for k in state.result.items()}
+
+
+@app.get("/")
+async def root():
+    return {"/youtube_upload_from_gdrive": f"{youtube_upload_from_gdrive.__doc__}"}
+
+
+@app.get("/initialize")
+async def root():
+    return {"/youtube_upload_from_gdrive": f"{youtube_upload_from_gdrive.__doc__}"}

@@ -1,4 +1,4 @@
-class YoutubeParam(object):
+class YoutubeRequestParam(object):
     def __init__(self, params):
         """
         :param params:
@@ -67,4 +67,3 @@ class YoutubeParam(object):
     @mov_id.setter
     def mov_id(self, value):
         self._mov_id = value
-

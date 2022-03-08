@@ -5,9 +5,10 @@ import time as tm
 from googleapiclient.errors import HttpError
 from googleapiclient.http import MediaFileUpload
 from prefect import task
+from prefect.tasks.notifications import SlackTask
 from prefect.utilities.notifications import slack_notifier
 
-from util.util import slack_notify, dict_to_json
+from util.util import dict_to_json
 
 
 @task(name="youtube_upload", state_handlers=[slack_notifier])
@@ -23,7 +24,6 @@ def youtube_upload(client, config, params) -> list:
                 if response is not None:
                     if 'id' in response:
                         print("Video id '%s' was successfully uploaded." % response['id'])
-                        slack_notify(txt=f"```{response['id']}```")
                         return response['id']
                     else:
                         exit("The upload failed with an unexpected response: %s" % response)
@@ -50,7 +50,20 @@ def youtube_upload(client, config, params) -> list:
         body=params.request, media_body=MediaFileUpload(params.mov_mp4, chunksize=-1, resumable=True)
     )
 
+    slack_task = SlackTask()
+    slack_task.run(message=confirm_meg.run())
+
     wait = 10
+    tm.sleep(wait)
+
+    video_id = resumable_upload(upload_request, config["youtube_conf"])
+    params.mov_id = video_id
+
+    return params
+
+
+@task()
+def confirm_meg():
     txt = f"<!channel>\n" \
           f"{wait}秒後に投稿処理を行います、内容を確認して下さい。\n" \
           f"*file* \n" \
@@ -58,10 +71,4 @@ def youtube_upload(client, config, params) -> list:
           f"*json* \n" \
           f"```{dict_to_json(params.request)}```"
 
-    slack_notify(txt=txt)
-    tm.sleep(wait)
-
-    video_id = resumable_upload(upload_request, config.youtube)
-    params.mov_id = video_id
-
-    return params
+    return txt
