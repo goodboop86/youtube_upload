@@ -50,10 +50,17 @@ def youtube_upload(client, config, params) -> list:
         body=params.request, media_body=MediaFileUpload(params.mov_mp4, chunksize=-1, resumable=True)
     )
 
-    slack_task = SlackTask()
-    slack_task.run(message=confirm_meg.run())
-
     wait = 10
+    txt = f"<!channel>\n" \
+          f"{wait}秒後に投稿処理を行います、内容を確認して下さい。\n" \
+          f"*file* \n" \
+          f"```{params.mov_mp4}```\n" \
+          f"*json* \n" \
+          f"```{dict_to_json(params.request)}```"
+
+    slack_task = SlackTask()
+    slack_task.run(message=confirm_meg.run(txt))
+
     tm.sleep(wait)
 
     video_id = resumable_upload(upload_request, config["youtube_conf"])
@@ -63,12 +70,5 @@ def youtube_upload(client, config, params) -> list:
 
 
 @task()
-def confirm_meg():
-    txt = f"<!channel>\n" \
-          f"{wait}秒後に投稿処理を行います、内容を確認して下さい。\n" \
-          f"*file* \n" \
-          f"```{params.mov_mp4}```\n" \
-          f"*json* \n" \
-          f"```{dict_to_json(params.request)}```"
-
+def confirm_meg(txt):
     return txt
