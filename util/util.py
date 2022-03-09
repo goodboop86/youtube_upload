@@ -53,59 +53,45 @@ def get_client_by_cloud(conf):
 
 @task(name="secret_set")
 def secret_set(config):
-    """
-    :param config:
-    dict(
-        "***_conf":
-            dict(
-                "TOKEN_ENV":"SOME_TOKEN_VALUE"
-                )
-        )
-    :return: boolean
-    """
-
-    def write_token(_value, _path):
-        with open(path, mode='x') as f:
-            f.write(_value)
+    def write_file(_value, _path):
+        with open(path, mode='x') as fp:
+            fp.write(_value)
         os.chmod(path, 0o755)
 
     logger = prefect.context.get("logger")
 
-    token_env = "TOKEN_ENV"
-    token = "TOKEN"
-    token_env_names = []
-    token_path = []
-
-    # configからmountされている可能性のある環境変数名(conf[token_env])と保存先(conf[token])を取得
-    for conf in config.values():
-        if token_env in conf:
-            token_env_names.append(conf[token_env])
-        if token in conf:
-            token_path.append(conf[token])
+    # conf/conf.py で取り扱えない情報
+    env_path = {'GOOGLEDRIVE_ACCESS_TOKEN': 'token/googledrive-access-token.json',
+                'SPREADSHEET_ACCESS_TOKEN': 'token/spreadsheet-access-token.json',
+                'YOUTUBE_ACCESS_TOKEN': 'token/youtube-access-token.json',
+                'PERSONAL_CONF': 'credential/personal-conf.json'}
 
     # 環境変数が存在するなら内容を保存する
     is_cloud_operate = False
-    for name, path in zip(token_env_names, token_path):
-        if os.getenv(name) is not None:
-
-            logger.info(f"Confirmed It is set this environment. : {name}")
-            if not os.path.exists(path):
-                logger.info(f"Write it to '{path}' ...")
-                write_token(_value=os.getenv(name), _path=path)
-            else:
-                logger.info(f"Already created. (skip)")
-            # クラウド環境ではclientの取得方法が異なる
-            is_cloud_operate = True
-
+    for env in env_path:
+        path = env_path[env]
+        if os.path.exists(path):
+            logger.info(f"Already exists : {path}")
         else:
-            logger.info(f"It is not set this environment : {name} ")
-            logger.info(f"Is it already exist in? : {path}, {os.path.exists(path)}")
+            if os.getenv(env) is None:
+                logger.info(f"'{env}' os None.")
+                raise Exception
+            else:
+                logger.info(f"Write it to : '{env}' -> '{path}'")
+                write_file(_value=os.getenv(env), _path=path)
+                is_cloud_operate = True
 
-    return is_cloud_operate
+    # personal-conf
+    with open('credential/personal-conf.json') as f:
+        config['personal_conf'] = json.load(f)
+
+    return is_cloud_operate, config
 
 
 @task(name="client_set")
 def client_set(is_cloud_operate, config):
+
+    # googleAPI周りのセット
     get_client = get_client_by_cloud if is_cloud_operate else get_client_by_local
 
     client = ApiClient(drive=get_client(config["drive_conf"]),

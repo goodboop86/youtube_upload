@@ -13,9 +13,9 @@ from util.util import secret_set, client_set
 
 
 def initialize():
-    status = secret_set.run(config=conf)
-    client = client_set.run(is_cloud_operate=status, config=conf)
-    return client, conf
+    status, config = secret_set.run(config=conf)
+    client = client_set.run(is_cloud_operate=status, config=config)
+    return client, config
 
 
 def youtube_upload_from_gdrive(client, config):

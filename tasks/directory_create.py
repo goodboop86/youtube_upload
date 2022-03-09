@@ -4,7 +4,6 @@ from datetime import datetime, timedelta
 
 import prefect
 from prefect import task
-from prefect import config as pconfig
 
 from prefect.utilities.notifications import slack_notifier
 
@@ -13,7 +12,8 @@ from prefect.utilities.notifications import slack_notifier
 def directory_create(client, config, _=None):
     logger = prefect.context.get("logger")
     # ディレクトリ情報を取得
-    query = config["drive_conf"]["query"]["GET_FNAME_FROMDIR_ID"].replace("[DIR_ID]", pconfig.context.drive.YOUTUBE_DIR_ID)
+    query = config["drive_conf"]["query"]["GET_FNAME_FROMDIR_ID"].replace(
+        "[DIR_ID]", config['personal_conf']['YOUTUBE_DIR_ID'])
     result = client.drive.files().list(q=query, pageSize=20,
                                        fields=config["drive_conf"]["query"]["FIELD1"]).execute().get('files', [])
 
@@ -29,7 +29,7 @@ def directory_create(client, config, _=None):
     file_metadata = {
         'name': '',
         'mimeType': 'application/vnd.google-apps.folder',
-        'parents': [pconfig.context.drive.YOUTUBE_DIR_ID]
+        'parents': [config['personal_conf']['YOUTUBE_DIR_ID']]
     }
 
     # 向こう７日分を作成

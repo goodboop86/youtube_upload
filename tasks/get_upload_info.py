@@ -3,7 +3,6 @@ import pandas as pd
 import prefect
 from prefect import task
 from prefect.utilities.notifications import slack_notifier
-from prefect import config as pconf
 
 from model.youtube_request_param import YoutubeRequestParam
 from util.util import dict_to_json
@@ -18,11 +17,11 @@ def get_upload_info(client, config, _):
 
     # spreadシートからtsv中身を取得
     header = client.spread.spreadsheets().values().\
-        get(spreadsheetId=pconf.context.spread.UPLOAD_LIST_ID,
+        get(spreadsheetId=config['personal_conf']["UPLOAD_LIST_ID"],
             range=config["spread_conf"]["HEADER_RANGE"]).execute().get('values', [])
 
     body = client.spread.spreadsheets().values().\
-        get(spreadsheetId=pconf.context.spread.UPLOAD_LIST_ID,
+        get(spreadsheetId=config['personal_conf']['UPLOAD_LIST_ID'],
             range=config["spread_conf"]["BODY_RANGE"]).execute().get('values', [])
 
     logger.info(f"Checking today's Upload info.")

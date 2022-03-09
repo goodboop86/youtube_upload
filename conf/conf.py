@@ -6,7 +6,7 @@ conf = {
         "CREDENTIALS": 'credential/googledrive-access-credentials.json',
         "CREDENTIALS_ENV": 'GOOGLEDRIVE_ACCESS_CREDENTIALS',
         "TOKEN": 'token/googledrive-access-token.json',
-        "TOKEN_ENV": 'SPREADSHEET_ACCESS_TOKEN',
+        "TOKEN_ENV": 'GOOGLEDRIVE_ACCESS_TOKEN',
         "VERSION": 'v3',
         "SERVICE_NAME": 'drive',
         "SCOPES": ['https://www.googleapis.com/auth/drive', 'https://www.googleapis.com/auth/spreadsheets'],

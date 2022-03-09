@@ -6,7 +6,6 @@ import prefect
 from googleapiclient.http import MediaIoBaseDownload
 from prefect import task
 from prefect.utilities.notifications import slack_notifier
-from prefect import config as pconfig
 from prefect.tasks.notifications import SlackTask
 
 
@@ -30,7 +29,7 @@ def get_upload_file(client, config, _):
 
     # YOUTUBE_DIR_IDフォルダに含まれるファイルリストを取得
     query = config["drive_conf"]["query"]["GET_FNAME_FROMDIR_ID"].replace(
-        "[DIR_ID]", pconfig.context.drive.YOUTUBE_DIR_ID)
+        "[DIR_ID]", config['personal_conf']['YOUTUBE_DIR_ID'])
 
     logger.info(f"Check with :  {query}")
 
