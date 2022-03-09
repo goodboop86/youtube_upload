@@ -17,6 +17,11 @@ ENV TINI_VERSION v0.18.0
 ADD https://github.com/krallin/tini/releases/download/${TINI_VERSION}/tini-static /tini
 RUN chmod +x /tini
 
+
+# prefect ENV
+ENV PREFECT__LOGGING__LEVEL="INFO"
+ENV PREFECT__LOGGING__FORMAT="[%(asctime)s] %(levelname)s - %(name)s | %(message)s"
+
 EXPOSE 8080
 # RUN sed -i -e "s/PORT/$PORT/g" start.sh
 # CMD exec gunicorn --bind :$PORT --workers 1 --worker-class uvicorn.workers.UvicornWorker  --threads 8 main:app
