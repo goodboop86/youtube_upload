@@ -113,9 +113,11 @@ def secret_set(config):
         if os.getenv(name) is not None:
 
             logger.info(f"Confirmed It is set this environment. : {name}")
-            logger.info(f"Write it to '{path}' ...")
-
-            write_token(_value=os.getenv(name), _path=path)
+            if not os.path.exists(path):
+                logger.info(f"Write it to '{path}' ...")
+                write_token(_value=os.getenv(name), _path=path)
+            else:
+                logger.info(f"Already created. (skip)")
             # クラウド環境ではclientの取得方法が異なる
             is_cloud_operate = True
 
