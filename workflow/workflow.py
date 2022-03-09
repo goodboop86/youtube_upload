@@ -13,8 +13,8 @@ from util.util import secret_set, client_set
 
 
 def initialize():
-    status = secret_set(config=conf)
-    client = client_set(is_cloud_operate=status, config=conf)
+    status = secret_set.run(config=conf)
+    client = client_set.run(is_cloud_operate=status, config=conf)
     return client, conf
 
 

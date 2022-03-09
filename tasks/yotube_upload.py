@@ -2,6 +2,7 @@ from datetime import time
 from random import random
 import time as tm
 
+import prefect
 from googleapiclient.errors import HttpError
 from googleapiclient.http import MediaFileUpload
 from prefect import task
@@ -45,6 +46,8 @@ def youtube_upload(client, config, params) -> list:
                 print("Sleeping %f seconds and then retrying..." % sleep_seconds)
                 time.sleep(sleep_seconds)
 
+    logger = prefect.context.get("logger")
+
     upload_request = client.youtube.videos().insert(
         part=",".join(params.request.keys()),
         body=params.request, media_body=MediaFileUpload(params.mov_mp4, chunksize=-1, resumable=True)
@@ -62,6 +65,8 @@ def youtube_upload(client, config, params) -> list:
     slack_task.run(message=confirm_meg.run(txt))
 
     tm.sleep(wait)
+
+    logger.info("Uploading...")
 
     video_id = resumable_upload(upload_request, config["youtube_conf"])
     params.mov_id = video_id

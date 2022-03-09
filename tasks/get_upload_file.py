@@ -1,6 +1,8 @@
 import io
 import os
 from datetime import datetime
+
+import prefect
 from googleapiclient.http import MediaIoBaseDownload
 from prefect import task
 from prefect.utilities.notifications import slack_notifier
@@ -24,9 +26,13 @@ def get_upload_file(client, config, _):
             status, done = downloader.next_chunk()
             print(f"Download {int(status.progress() * 100)}%")
 
+    logger = prefect.context.get("logger")
+
     # YOUTUBE_DIR_IDフォルダに含まれるファイルリストを取得
     query = config["drive_conf"]["query"]["GET_FNAME_FROMDIR_ID"].replace(
         "[DIR_ID]", pconfig.context.drive.YOUTUBE_DIR_ID)
+
+    logger.info(f"Check with :  {query}")
 
     result = client.drive.files().list(q=query, pageSize=100,
                                        fields=config["drive_conf"]["query"]["FIELD1"]).execute().get('files', [])
@@ -39,15 +45,19 @@ def get_upload_file(client, config, _):
 
     # 実行日のディレクトリは１つ想定
     assert len(today_dir_id) == 1, f"expect:[1], actual[{len(today_dir_id)}]"
+    logger.info(f"Confirmed today' directory is there. :  {query}")
     today_dir_id = today_dir_id[0]
 
     # 実行日のディレクトリ内のファイルIDを取得
     query = config["drive_conf"]["query"]["GET_FNAME_FROMDIR_ID"].replace("[DIR_ID]", today_dir_id)
+    logger.info(f"Check with :  {query}")
+
     result = client.drive.files().list(q=query, pageSize=100,
                                        fields=config["drive_conf"]["query"]["FIELD1"]).execute().get('files', [])
 
     # 実行日のディレクトリ内のファイルID, ファイル名を取得
     filedata = [(d['id'], d['name']) for d in result]
+    logger.info(f"Upload-files in today's directory. :  {filedata}")
 
     # 当日ディレクトリに動画、サムネイルが保存されていない or それ以外の取得エラー
     if len(filedata) != 2:

@@ -13,3 +13,4 @@ prefect~=1.0.0
 uvicorn[standard]
 # pip install fastapi[all]
 fastapi~=0.74.1
+PyYAML~=6.0

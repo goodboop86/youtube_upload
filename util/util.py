@@ -3,14 +3,14 @@ from __future__ import print_function
 import json
 import os.path
 import os
-
+import prefect
 
 from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
 from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
-
+from prefect import task
 
 from model.api_client import ApiClient
 
@@ -56,6 +56,7 @@ def get_client_by_local(conf):
 
 
 def get_client_by_cloud(conf):
+
     # CloudRunでcredentialなどを環境変数で設定する場合
     token_path = conf["TOKEN"]
     token_env = os.getenv(conf["TOKEN_ENV"])
@@ -74,6 +75,7 @@ def get_client_by_cloud(conf):
         print(err)
 
 
+@task(name="secret_set")
 def secret_set(config):
     """
     :param config:
@@ -85,13 +87,16 @@ def secret_set(config):
         )
     :return: boolean
     """
+
     def write_token(_value, _path):
         with open(path, mode='x') as f:
             f.write(_value)
         os.chmod(path, 0o755)
 
+    logger = prefect.context.get("logger")
+
     token_env = "TOKEN_ENV"
-    token = "token"
+    token = "TOKEN"
     token_env_names = []
     token_path = []
 
@@ -106,13 +111,22 @@ def secret_set(config):
     is_cloud_operate = False
     for name, path in zip(token_env_names, token_path):
         if os.getenv(name) is not None:
+
+            logger.info(f"Confirmed It is set this environment. : {name}")
+            logger.info(f"Write it to '{path}' ...")
+
             write_token(_value=os.getenv(name), _path=path)
             # クラウド環境ではclientの取得方法が異なる
             is_cloud_operate = True
 
+        else:
+            logger.info(f"It is not set this environment : {name} ")
+            logger.info(f"Is it already exist in? : {path}, {os.path.exists(path)}")
+
     return is_cloud_operate
 
 
+@task(name="client_set")
 def client_set(is_cloud_operate, config):
     get_client = get_client_by_cloud if is_cloud_operate else get_client_by_local
 
