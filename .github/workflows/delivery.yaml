@@ -52,7 +52,7 @@ jobs:
         run: |
           gcloud run deploy $PROJECT_ID --image gcr.io/${{ env.PROJECT_ID }}/${{ env.SERVICE }}:${{ github.sha }} --platform managed --region ${{ env.REGION }} \
           --allow-unauthenticated \
-          --service-account ${{ env.SERVICE_ACCOUNT }}
+          --service-account ${{ env.SERVICE_ACCOUNT }} \
           --update-secrets=GOOGLEDRIVE_ACCESS_TOKEN=googledrive-access-token:1,SPREADSHEET_ACCESS_TOKEN=spreadsheet-access-token:1,YOUTUBE_ACCESS_TOKEN=youtube-access-token:1,PERSONAL_CONF=personal-conf:1,SLACK_WEBHOOK_URL=prefect-slack-webhook:1
 
       # - name: Deploy
