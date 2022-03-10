@@ -1,45 +1,89 @@
-name: Delivery
+name: Build and Deploy a Container
 
 on:
+  pull_request:
+    branches: [ develop ]
   push:
     branches:
-      - master
+      - develop
+
+permissions:
+  contents: read
+  pull-requests: write
 
 env:
-  GCP_PROJECT: ${{ secrets.GCP_PROJECT }}
-  GCP_REGION: ${{ secrets.GCP_REGION }}
-  IMAGE: asia.gcr.io/${{ secrets.GCP_PROJECT }}/foobar:${{ github.sha }}
+  PROJECT_ID: ${{ secrets.GCP_PROJECT }}
+  PREFECT_API_KEY: ${{ secrets.PREFECT_API_KEY }}
+  SERVICE_ACCOUNT: youtubeservice@youtubeoperation.iam.gserviceaccount.com
+  SERVICE: youtubeservice
+  REGION: asia-northeast1
+  IMAGE: gcr.io/${{ secrets.GCP_PROJECT }}/${{ secrets.SERVICE }}:${{ github.sha }}
 
 jobs:
-  delivery:
-
+  deploy:
     runs-on: ubuntu-latest
-
+    permissions:
+      id-token: 'write'
     steps:
-      - name: Checkout the repository
-        uses: actions/checkout@v1
+      - name: Checkout
+        uses: actions/checkout@v2
 
-      - name: GCP Authenticate
-        uses: GoogleCloudPlatform/github-actions/setup-gcloud@master
+      - id: 'auth'
+        uses: 'google-github-actions/auth@v0.4.1'
         with:
-          version: '273.0.0'
-          service_account_email: ${{ secrets.GCP_SA_EMAIL }}
-          service_account_key: ${{ secrets.GCP_SA_KEY }}
+          # ref:https://dev.classmethod.jp/articles/google-cloud-auth-with-workload-identity/
+          workload_identity_provider: "projects/934369182340/locations/global/workloadIdentityPools/my-pool/providers/my-provider"
+          service_account: ${{ env.SERVICE_ACCOUNT }}
 
-      - name: Configure docker to use the gcloud cli
-        run: gcloud auth configure-docker --quiet
+      - name: Setup Cloud SDK
+        uses: google-github-actions/setup-gcloud@v0.2.0
 
-      - name: Build a docker image
-        run: docker build . -t $IMAGE
+      - name: Authorize Docker push
+        run: gcloud auth configure-docker
 
-      - name: Push the docker image
-        run: docker push $IMAGE
+      - name: Build and Push Container
+        run: |-
+          export PREFECT_API_KEY=${{ secrets.PREFECT_API_KEY }}
+          DOCKER_BUILDKIT=1 docker build -t gcr.io/${{ env.PROJECT_ID }}/${{ env.SERVICE }}:${{ github.sha }} --secret id=my_env1,env=PREFECT_API_KEY --no-cache --progress=plain .
+          docker push gcr.io/${{ env.PROJECT_ID }}/${{ env.SERVICE }}:${{ github.sha }}
 
-      - name: Deploy to Cloud Run
+      # deploay cloudrunは現状複数のsecretを渡せない
+      - name: Deploy
         run: |
-            gcloud run deploy foobar \
-              --image $IMAGE \
-              --project $GCP_PROJECT \
-              --region $GCP_REGION \
-              --platform managed \
-              --quiet
+          gcloud run deploy $PROJECT_ID --image gcr.io/${{ env.PROJECT_ID }}/${{ env.SERVICE }}:${{ github.sha }} --platform managed --region ${{ env.REGION }} \
+          --allow-unauthenticated \
+          --service-account ${{ env.SERVICE_ACCOUNT }} \
+          --update-secrets=GOOGLEDRIVE_ACCESS_TOKEN=googledrive-access-token:1,SPREADSHEET_ACCESS_TOKEN=spreadsheet-access-token:1,YOUTUBE_ACCESS_TOKEN=youtube-access-token:1,PERSONAL_CONF=personal-conf:1,SLACK_WEBHOOK_URL=prefect-slack-webhook:1
+
+      # - name: Deploy
+      #   run: |
+      #     gcloud run deploy $PROJECT_ID --image gcr.io/${{ env.PROJECT_ID }}/${{ env.SERVICE }}:${{ github.sha }} --platform managed --region ${{ env.REGION }} \
+      #     --update-secrets=/credential/googledrive-access-credentials.json=googledrive-access-credentials:latest \
+      #     --update-secrets=/credential/spreadsheet-access-credentials.json=spreadsheet-access-credentials:latest \
+      #     --update-secrets=/credential/youtube-access-credentials.json=youtube-access-credentials:latest \
+      #     --update-secrets=/token/googledrive-access-token.json=googledrive-access-token:latest \
+      #     --update-secrets=/token/spreadsheet-access-token.json=spreadsheet-access-token:latest \
+      #     --update-secrets=/token/youtube-access-token.json=youtube-access-token:latest
+
+
+      # - name: Build
+      #   uses: docker/build-push-action@v2
+      #   with:
+      #     context: .
+      #     tags: goodboop86/prefect:latest
+      #     secrets: |
+      #       "my_env1=${{ secrets.PREFECT_API_KEY }}"
+
+      # - id: 'deploy'
+      #   uses: google-github-actions/deploy-cloudrun@v0.7.0
+      #   with:
+      #     service: ${{ env.SERVICE }}
+      #     image: gcr.io/${{ env.PROJECT_ID }}/${{ env.SERVICE }}:${{ github.sha }}
+      #     region: ${{ env.REGION }}
+      #     secrets: |
+      #       GOOGLEDRIVE_ACCESS_CREDENTIALS=googledrive-access-credentials:1
+      #       SPREADSHEET_ACCESS_CREDENTIALS=spreadsheet-access-credentials:1
+      #       YOUTUBE_ACCESS_CREDENTIALS=youtube-access-credentials:1
+      #       GOOGLEDRIVE_ACCESS_TOKEN=googledrive-access-token:1
+      #       SPREADSHEET_ACCESS_TOKEN=spreadsheet-access-token:1
+      #       YOUTUBE_ACCESS_TOKEN=youtube-access-token:1

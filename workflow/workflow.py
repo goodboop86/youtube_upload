@@ -1,13 +1,21 @@
 from __future__ import print_function
 
 # DIY Package
-from job.directory_create import directory_create
-from job.get_upload_info import get_upload_info
-from job.get_upload_file import get_upload_file
-from job.upload_thumbnail import upload_thumbnail
-from job.yotube_upload import youtube_upload
+from tasks.directory_create import directory_create
+from tasks.get_upload_info import get_upload_info
+from tasks.get_upload_file import get_upload_file
+from tasks.upload_thumbnail import upload_thumbnail
+from tasks.yotube_upload import youtube_upload
 from prefect import Flow
 from prefect.run_configs import LocalRun
+from conf.conf import conf as conf
+from util.util import secret_set, client_set
+
+
+def initialize():
+    status, config = secret_set.run(config=conf)
+    client = client_set.run(is_cloud_operate=status, config=config)
+    return client, config
 
 
 def youtube_upload_from_gdrive(client, config):
