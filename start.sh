@@ -1,6 +1,9 @@
 #!/usr/bin/env bash
 set -e
 
+# prefect ENV
+export PREFECT__LOGGING__LEVEL="INFO"
+export PREFECT__LOGGING__FORMAT="[%(asctime)s] %(levelname)s - %(name)s | %(message)s"
 
 
 prefect agent local start &
