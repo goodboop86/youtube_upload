@@ -3,7 +3,14 @@ import workflow.workflow as wf
 
 app = FastAPI()
 
-if not set(locals()) >= {'client', 'config'}:
+config = None
+client = None
+
+
+@app.on_event("startup")
+async def startup_event():
+    global config
+    global client
     client, config = wf.initialize()
 
 
@@ -19,10 +26,5 @@ async def youtube_upload_from_gdrive():
 
 
 @app.get("/")
-async def root():
-    return {"/youtube_upload_from_gdrive": f"{youtube_upload_from_gdrive.__doc__}"}
-
-
-@app.get("/initialize")
 async def root():
     return {"/youtube_upload_from_gdrive": f"{youtube_upload_from_gdrive.__doc__}"}
