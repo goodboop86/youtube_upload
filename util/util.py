@@ -90,6 +90,7 @@ def secret_set(config):
 
 @task(name="client_set")
 def client_set(is_cloud_operate, config):
+    logger = prefect.context.get("logger")
 
     # googleAPI周りのセット
     get_client = get_client_by_cloud if is_cloud_operate else get_client_by_local
@@ -97,6 +98,9 @@ def client_set(is_cloud_operate, config):
     client = ApiClient(drive=get_client(config["drive_conf"]),
                        spread=get_client(config["spread_conf"]),
                        youtube=get_client(config["youtube_conf"]))
+
+    logger.info("client set complete.")
+
     return client
 
 
